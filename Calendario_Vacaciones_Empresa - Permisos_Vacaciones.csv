@@ -1,0 +1,5 @@
+ID Empleado,Nombre,Fecha inicio,Fecha fin,Tipo,Estado
+1,Ana Torres,2024-07-01 00:00:00,2024-07-10 00:00:00,Vacaciones,Aprobado
+2,Luis Gómez,2024-08-10 00:00:00,2024-08-15 00:00:00,Permiso,Pendiente
+1,Ana Torres,2024-12-20 00:00:00,2025-01-03 00:00:00,Vacaciones,Aprobado
+3,María Díaz,2024-04-15 00:00:00,2024-04-20 00:00:00,Licencia médica,Aprobado

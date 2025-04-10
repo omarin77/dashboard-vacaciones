@@ -43,7 +43,7 @@ export default function DashboardVacaciones() {
     cargarDatos();
   }, []);
 
-  const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre))];
+const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre).filter(nombre => nombre && nombre.trim() !== ""))];
 
   const eventosFiltrados = filtroEmpleado === "Todos"
     ? eventos
