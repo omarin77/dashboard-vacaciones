@@ -19,6 +19,8 @@ export default function DashboardVacaciones() {
     Estado: "Pendiente"
   });
 
+  const [nuevoEmpleadoActivo, setNuevoEmpleadoActivo] = useState(false);
+
   const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdX-K_jY6BxDmxtASuN098lWkgoMqusOOXu1-oV1UhvsvfItg/formResponse";
 
   const cargarDatos = () => {
@@ -43,7 +45,7 @@ export default function DashboardVacaciones() {
     cargarDatos();
   }, []);
 
-const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre).filter(nombre => nombre && nombre.trim() !== ""))];
+  const empleadosUnicos = [...new Set(eventos.map(e => e.Nombre).filter(nombre => nombre && nombre.trim() !== ""))];
 
   const eventosFiltrados = filtroEmpleado === "Todos"
     ? eventos
@@ -78,6 +80,7 @@ const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre).filter(n
       "Fecha fin": "",
       Estado: "Pendiente"
     });
+    setNuevoEmpleadoActivo(false);
     setTimeout(() => {
       cargarDatos();
     }, 3000);
@@ -100,18 +103,21 @@ const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre).filter(n
             <CardContent>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h6">Calendario de Permisos</Typography>
-                <FormControl size="small" sx={{ minWidth: 180 }}>
-                  <InputLabel>Empleado</InputLabel>
-                  <Select
-                    value={filtroEmpleado}
-                    label="Empleado"
-                    onChange={e => setFiltroEmpleado(e.target.value)}
-                  >
-                    {empleadosUnicos.map(nombre => (
-                      <MenuItem key={nombre} value={nombre}>{nombre}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                {empleadosUnicos.length > 0 && (
+                  <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel>Empleado</InputLabel>
+                    <Select
+                      value={filtroEmpleado}
+                      label="Empleado"
+                      onChange={e => setFiltroEmpleado(e.target.value)}
+                    >
+                      <MenuItem value="Todos">Todos</MenuItem>
+                      {empleadosUnicos.map(nombre => (
+                        <MenuItem key={nombre} value={nombre}>{nombre}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
               </Box>
               <Calendar />
             </CardContent>
@@ -123,18 +129,66 @@ const empleadosUnicos = ["Todos", ...new Set(eventos.map(e => e.Nombre).filter(n
             <CardContent>
               <Typography variant="h6" gutterBottom>Solicitar Permiso</Typography>
               <Box display="flex" flexDirection="column" gap={2}>
-                <TextField label="Nombre" value={nuevoEvento.Nombre} onChange={e => manejarCambio("Nombre", e.target.value)} />
+                <FormControl>
+                  <InputLabel>Empleado</InputLabel>
+                  <Select
+                    value={nuevoEmpleadoActivo ? "__nuevo__" : nuevoEvento.Nombre}
+                    onChange={(e) => {
+                      if (e.target.value === "__nuevo__") {
+                        setNuevoEmpleadoActivo(true);
+                        manejarCambio("Nombre", "");
+                      } else {
+                        setNuevoEmpleadoActivo(false);
+                        manejarCambio("Nombre", e.target.value);
+                      }
+                    }}
+                  >
+                    {empleadosUnicos.map((nombre) => (
+                      <MenuItem key={nombre} value={nombre}>
+                        {nombre}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="__nuevo__">➕ Nuevo empleado</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {nuevoEmpleadoActivo && (
+                  <TextField
+                    label="Nombre del nuevo empleado"
+                    value={nuevoEvento.Nombre}
+                    onChange={(e) => manejarCambio("Nombre", e.target.value)}
+                  />
+                )}
+
                 <FormControl>
                   <InputLabel>Tipo</InputLabel>
-                  <Select value={nuevoEvento.Tipo} onChange={e => manejarCambio("Tipo", e.target.value)}>
+                  <Select
+                    value={nuevoEvento.Tipo}
+                    onChange={(e) => manejarCambio("Tipo", e.target.value)}
+                  >
                     <MenuItem value="Vacaciones">Vacaciones</MenuItem>
                     <MenuItem value="Permiso">Permiso</MenuItem>
                     <MenuItem value="Licencia médica">Licencia médica</MenuItem>
                   </Select>
                 </FormControl>
-                <TextField type="date" label="Fecha inicio" InputLabelProps={{ shrink: true }} value={nuevoEvento["Fecha inicio"]} onChange={e => manejarCambio("Fecha inicio", e.target.value)} />
-                <TextField type="date" label="Fecha fin" InputLabelProps={{ shrink: true }} value={nuevoEvento["Fecha fin"]} onChange={e => manejarCambio("Fecha fin", e.target.value)} />
-                <Button variant="contained" onClick={manejarEnvio}>Enviar Solicitud</Button>
+
+                <TextField
+                  type="date"
+                  label="Fecha inicio"
+                  InputLabelProps={{ shrink: true }}
+                  value={nuevoEvento["Fecha inicio"]}
+                  onChange={(e) => manejarCambio("Fecha inicio", e.target.value)}
+                />
+                <TextField
+                  type="date"
+                  label="Fecha fin"
+                  InputLabelProps={{ shrink: true }}
+                  value={nuevoEvento["Fecha fin"]}
+                  onChange={(e) => manejarCambio("Fecha fin", e.target.value)}
+                />
+                <Button variant="contained" onClick={manejarEnvio}>
+                  Enviar Solicitud
+                </Button>
               </Box>
             </CardContent>
           </Card>
